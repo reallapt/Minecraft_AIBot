@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        VITE_API_BASE: "${VITE_API_BASE:?Set VITE_API_BASE in .env}"
+        VITE_WS_BASE: "${VITE_WS_BASE:-}"
+    container_name: game-bot-frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
