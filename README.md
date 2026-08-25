@@ -172,6 +172,10 @@ pnpm run build
 - 不要提交 `.env`、`backend/.env`、`frontend/.env` 或 `agent/bot-passwords.json`。
 - 公网部署请使用 HTTPS/WSS 和反向代理。
 
+## 许可证
+
+本项目采用 [MIT License](https://opensource.org/licenses/MIT)。
+
 ---
 
 # Remote Game Bot Controller
@@ -350,4 +354,4 @@ pnpm run build
 
 ## License
 
-No project license is currently declared. Unless the owner grants permission, do not treat this repository as redistributable open-source software.
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
