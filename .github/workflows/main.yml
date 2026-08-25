@@ -56,6 +56,8 @@ jobs:
             echo "Tag $tag already exists. Push a new version tag or choose a new tag name." >&2
             exit 1
           fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "$tag" -m "Release $tag"
           git push origin "$tag"
 
