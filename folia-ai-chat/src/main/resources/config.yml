@@ -1,0 +1,36 @@
+# Any OpenAI-compatible /chat/completions endpoint can be used here, including
+# providers such as OpenAI, Azure OpenAI-compatible gateways, DeepSeek, or Doubao.
+ai:
+  endpoint: "http://192.168.9.6:11434/v1/chat/completions"
+  api-key: "ollama"
+  model: "qwen3:8b"
+  system-prompt: "You are bot manager, a concise and helpful Minecraft server assistant. Reply in the player's language."
+  request-timeout-seconds: 60
+  max-history-messages: 10
+  max-response-characters: 800
+
+chat:
+  trigger: "@bot"
+  # Prompts are hidden from global chat by default; only the AI reply is posted.
+  hide-player-prompt: true
+  broadcast-replies: true
+  cooldown-seconds: 2
+  max-prompt-characters: 1000
+  max-line-characters: 240
+  reply-name: "bot manager"
+
+# 机器人自动管理：名字匹配 name-prefix 的玩家视为遥控假人。
+# 加入服务器时自动执行 on-join-commands（添加假人），
+# 离开时执行 on-quit-commands（删除假人，反向操作）。
+# %name% 会替换为玩家名。
+bots:
+  name-prefix: "Bot"
+  # 命令延迟（tick，1 秒 = 20 tick）：等 LuckPerms / PvP 插件完成玩家数据加载
+  command-delay-ticks: 20
+  on-join-commands:
+    - "pvp %name% off"
+    - "lp user %name% parent bot"
+  on-quit-commands:
+    - "pvp %name% on"
+    - "lp user %name% parent remove bot"
+

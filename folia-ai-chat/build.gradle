@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.mccontrol'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    implementation 'com.google.code.gson:gson:2.11.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+tasks.processResources {
+    filesMatching('plugin.yml') {
+        expand(version: project.version)
+    }
+}
+
+// Produces one deployable jar, including Gson, without requiring a shading plugin.
+tasks.register('pluginJar', Jar) {
+    group = 'build'
+    description = 'Builds the deployable Folia plugin jar.'
+    archiveClassifier = 'all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.main.output
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { dependency ->
+            dependency.isDirectory() ? dependency : zipTree(dependency)
+        }
+    }
+}
+
+tasks.build {
+    dependsOn tasks.named('pluginJar')
+}
+

@@ -1,0 +1,15 @@
+{
+  "name": "mc-bot-agent",
+  "version": "0.1.0",
+  "description": "MC Bot Controller 执行代理：Mineflayer 假人 + 后端 WebSocket 控制面",
+  "type": "module",
+  "main": "agent.js",
+  "scripts": {
+    "start": "node agent.js"
+  },
+  "dependencies": {
+    "mineflayer": "^4.37.1",
+    "mineflayer-pathfinder": "^2.4.5",
+    "ws": "^8.16.0"
+  }
+}

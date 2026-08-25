@@ -1,0 +1,19 @@
+name: FoliaAiChat
+version: ${version}
+main: com.mccontrol.foliaaichat.FoliaAiChatPlugin
+api-version: '1.21'
+folia-supported: true
+author: MC Bot Controller
+description: Replies to @bot chat messages through an OpenAI-compatible AI endpoint.
+commands:
+  botmanager:
+    description: Reload the Folia AI chat configuration.
+    usage: /botmanager reload
+    permission: foliaaichat.admin
+permissions:
+  foliaaichat.use:
+    description: Allows a player to talk to the bot.
+    default: true
+  foliaaichat.admin:
+    description: Allows reloading the plugin configuration.
+    default: op
