@@ -1,0 +1,71 @@
+name: Create Release Archive
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create, for example v1.0.0"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark this release as a prerelease"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package and publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve release tag
+        id: release
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ ! "$tag" =~ ^v[0-9] ]]; then
+            echo "Release tags must start with v followed by a number, for example v1.0.0." >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "archive=Minecraft_AIBot-$tag.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Check out release source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Create release archive
+        shell: bash
+        run: |
+          staging_dir="Minecraft_AIBot-${{ steps.release.outputs.tag }}"
+          mkdir "$staging_dir"
+          git archive "${{ steps.release.outputs.tag }}" | tar -x -C "$staging_dir"
+
+          rm -f "$staging_dir/agent/bot-passwords.json"
+          find "$staging_dir" -type f \( -name '.env' -o -name '*.local' \) -delete
+          find "$staging_dir" -type d \( -name node_modules -o -name dist -o -name build -o -name .venv -o -name __pycache__ -o -name .pytest_cache -o -name .gradle \) -prune -exec rm -rf {} +
+
+          zip -qr "${{ steps.release.outputs.archive }}" "$staging_dir"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Minecraft AIBot ${{ steps.release.outputs.tag }}
+          generate_release_notes: true
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease || false }}
+          files: ${{ steps.release.outputs.archive }}
