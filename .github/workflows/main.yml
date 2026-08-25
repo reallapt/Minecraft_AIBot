@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to create, for example v1.0.0"
+        description: "New release tag, for example v1.0.0 or v1.0.0-beta"
         required: true
         type: string
       prerelease:
@@ -34,8 +34,8 @@ jobs:
             tag="${GITHUB_REF_NAME}"
           fi
 
-          if [[ ! "$tag" =~ ^v[0-9] ]]; then
-            echo "Release tags must start with v followed by a number, for example v1.0.0." >&2
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "Use a semantic version tag such as v1.0.0 or v1.0.0-beta; spaces are not allowed." >&2
             exit 1
           fi
 
@@ -43,10 +43,21 @@ jobs:
           echo "archive=Minecraft_AIBot-$tag.zip" >> "$GITHUB_OUTPUT"
 
       - name: Check out release source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          ref: ${{ steps.release.outputs.tag }}
           fetch-depth: 0
+
+      - name: Create tag for manual release
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          tag="${{ steps.release.outputs.tag }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists. Push a new version tag or choose a new tag name." >&2
+            exit 1
+          fi
+          git tag -a "$tag" -m "Release $tag"
+          git push origin "$tag"
 
       - name: Create release archive
         shell: bash
