@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      MC_API_KEY: ${MC_API_KEY:-}
+      MC_CORS_ORIGINS: ${MC_CORS_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      MC_HEARTBEAT_TIMEOUT_SECONDS: ${MC_HEARTBEAT_TIMEOUT_SECONDS:-45}
+      MC_OLLAMA_BASE_URL: ${MC_OLLAMA_BASE_URL:-}
+      MC_OLLAMA_MODEL: ${MC_OLLAMA_MODEL:-qwen3:8b}
+      MC_OLLAMA_API_KEY: ${MC_OLLAMA_API_KEY:-}
+      MC_OLLAMA_TIMEOUT_SECONDS: ${MC_OLLAMA_TIMEOUT_SECONDS:-90}
+      MC_AI_DECISION_HISTORY_SIZE: ${MC_AI_DECISION_HISTORY_SIZE:-300}
+      MC_AI_MAX_TOOL_ROUNDS: ${MC_AI_MAX_TOOL_ROUNDS:-4}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

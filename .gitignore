@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+backend/.venv/
+backend/.env
+
+# JavaScript
+node_modules/
+dist/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Runtime data and secrets
+data/
+*.log
+.env
+folia-ai-chat/.gradle/
+folia-ai-chat/build/
